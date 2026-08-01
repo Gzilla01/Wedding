@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, PointerEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, PointerEvent, useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import {
   createAdminId,
@@ -53,6 +53,7 @@ const sections: Array<{ id: AdminSection; label: string }> = [
   { id: "gallery", label: "Galeria" },
   { id: "room", label: "Mapa sali" },
   { id: "planning", label: "Planowanie" },
+  { id: "accounts", label: "Konta" },
 ];
 
 const statusLabel: Record<string, string> = {
@@ -145,6 +146,7 @@ export function AdminPanel({ storageKey, initialData = demoWeddingAdminData, rem
             {activeSection === "publish" && <PublicationManager settings={data.theme} wedding={data.wedding} onChange={(theme) => setData((current) => ({ ...current, theme }))} />}
             {activeSection === "room" && <RoomManager tables={data.tables} guests={data.guests} elements={data.roomElements} onTablesChange={(tables) => setData((current) => ({ ...current, tables }))} onGuestsChange={(guests) => setData((current) => ({ ...current, guests }))} onElementsChange={(roomElements) => setData((current) => ({ ...current, roomElements }))} />}
             {activeSection === "planning" && <PlanningManager planning={data.planning} onChange={(planning) => setData((current) => ({ ...current, planning }))} />}
+            {activeSection === "accounts" && <AccountsManager />}
             {activeSection === "qr" && <QrManager items={data.qrInvites} onChange={(qrInvites) => setData((current) => ({ ...current, qrInvites }))} />}
             {activeSection === "gallery" && <GalleryManager items={data.gallery} onChange={(gallery) => setData((current) => ({ ...current, gallery }))} />}
             {activeSection === "theme" && <ThemeManager settings={data.theme} onChange={(theme) => setData((current) => ({ ...current, theme }))} onReset={() => setData(initialData)} />}
@@ -1097,6 +1099,121 @@ function GalleryManager({ items, onChange }: { items: GalleryItem[]; onChange: (
   return <CrudLayout title="Galeria i moderacja" description="Moderuj zdjecia od gosci." form={<form onSubmit={submit} className="grid gap-3"><Field label="Tytul"><input className={inputClass} value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></Field><Field label="Autor"><input className={inputClass} value={draft.author} onChange={(e) => setDraft({ ...draft, author: e.target.value })} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field label="Status"><select className={inputClass} value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value as GalleryItem["status"] })}><option value="pending">W moderacji</option><option value="approved">Zatwierdzone</option><option value="rejected">Odrzucone</option></select></Field><Field label="Kategoria"><select className={inputClass} value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value as GalleryItem["category"] })}><option value="ceremony">Ceremonia</option><option value="party">Zabawa</option><option value="portraits">Portrety</option><option value="details">Detale</option></select></Field></div><FormActions editing={Boolean(editingId)} onCancel={() => { setDraft(emptyGalleryItem); setEditingId(null); }} /></form>}><DataList items={items} render={(item) => <Row key={item.id}><div><p className="font-medium">{item.title}</p><p className="text-sm text-zinc-500">{item.author} / {item.category}</p></div><Badge>{statusLabel[item.status]}</Badge><RowActions onEdit={() => { setDraft(item); setEditingId(item.id); }} onDelete={() => onChange(items.filter((entry) => entry.id !== item.id))} /></Row>} /></CrudLayout>;
 }
 
+type AdminUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: "superadmin";
+  createdAt: string;
+  lastSignInAt?: string | null;
+};
+
+function AccountsManager() {
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  async function loadUsers() {
+    setLoading(true);
+    setError("");
+    const response = await fetch("/api/admin/users", { cache: "no-store" });
+    setLoading(false);
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      setError(payload?.error ?? "Nie udalo sie pobrac kont.");
+      return;
+    }
+    const payload = await response.json();
+    setUsers(payload.users ?? []);
+  }
+
+  async function createUser(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+    const form = new FormData(event.currentTarget);
+    const response = await fetch("/api/admin/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.get("name")?.toString(),
+        email: form.get("email")?.toString(),
+        password: form.get("password")?.toString(),
+      }),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      setError(payload?.error ?? "Nie udalo sie utworzyc konta.");
+      return;
+    }
+    event.currentTarget.reset();
+    setMessage("Konto superadmina zostalo utworzone.");
+    setUsers((current) => [payload.user, ...current.filter((user) => user.id !== payload.user.id)]);
+  }
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
+  }
+
+  return (
+    <div className="grid gap-4">
+      <Panel title="Konta i uprawnienia" description="Na razie kazde konto ma role superadmina, czyli pelny dostep do panelu i wszystkich danych wesela.">
+        <div className="flex flex-wrap gap-3">
+          <SmallButton onClick={loadUsers}>{loading ? "Odswiezam..." : "Odswiez liste"}</SmallButton>
+          <SmallButton onClick={logout}>Wyloguj</SmallButton>
+        </div>
+        {message && <p className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">{message}</p>}
+        {error && <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
+      </Panel>
+
+      <CrudLayout title="Dodaj superadmina" description="Utworzone konto loguje sie przez /login. Haslo musi miec minimum 8 znakow." form={
+        <form onSubmit={createUser} className="grid gap-3">
+          <Field label="Imie / nazwa"><input className={inputClass} name="name" placeholder="Aleksandra" required /></Field>
+          <Field label="Email"><input className={inputClass} name="email" type="email" placeholder="osoba@example.com" required /></Field>
+          <Field label="Haslo"><input className={inputClass} name="password" type="password" minLength={8} required /></Field>
+          <button className={primaryButtonClass} type="submit">Utworz konto</button>
+        </form>
+      }>
+        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+          <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+            <thead className="bg-[#fffaf4] text-xs uppercase tracking-[0.12em] text-zinc-500">
+              <tr>
+                <th className="px-4 py-3">Nazwa</th>
+                <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">Rola</th>
+                <th className="px-4 py-3">Utworzone</th>
+                <th className="px-4 py-3">Ostatnie logowanie</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {users.map((user) => (
+                <tr key={user.id} className="hover:bg-[#fffaf4]">
+                  <td className="px-4 py-3 font-semibold text-zinc-900">{user.name}</td>
+                  <td className="px-4 py-3 text-zinc-600">{user.email}</td>
+                  <td className="px-4 py-3"><Badge>Superadmin</Badge></td>
+                  <td className="px-4 py-3 text-zinc-600">{formatDateTime(user.createdAt)}</td>
+                  <td className="px-4 py-3 text-zinc-600">{user.lastSignInAt ? formatDateTime(user.lastSignInAt) : "Jeszcze nie"}</td>
+                </tr>
+              ))}
+              {!users.length && (
+                <tr>
+                  <td className="px-4 py-6 text-center text-zinc-500" colSpan={5}>{loading ? "Laduje konta..." : "Brak kont w Supabase Auth. Awaryjnie nadal dziala login admin + haslo panelu."}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </CrudLayout>
+    </div>
+  );
+}
+
 function PlanningManager({ planning, onChange }: { planning: PlanningData; onChange: (planning: PlanningData) => void }) {
   const [tab, setTab] = useState<"budget" | "tasks" | "vendors" | "payments" | "documents" | "attachments">("budget");
   const plannedExpenses = planning.expenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -1244,40 +1361,69 @@ function BudgetManager({ planning, onChange }: { planning: PlanningData; onChang
           <FormActions editing={Boolean(editingId)} onCancel={() => { setDraft(emptyPlanningExpense); setEditingId(null); }} />
         </form>
       }>
-        <div className="grid gap-3">
-          {planning.expenses.length === 0 && <EmptyState text="Brak wydatkow. Dodaj sale, fotografa, dekoracje albo stroje." />}
-          {planning.expenses.map((expense) => {
-            const vendor = planning.vendors.find((item) => item.id === expense.vendorId);
-            const payment = planning.payments.find((item) => item.id === expense.paymentId);
-            const document = planning.documents.find((item) => item.id === expense.documentId);
-            const remaining = Math.max(expense.amount - expense.paidAmount, 0);
-            return (
-              <PlanningCard key={expense.id}>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-zinc-950">{expense.label}</p>
-                    <Badge tone={expense.status === "overdue" ? "danger" : "default"}>{expenseStatusLabel(expense.status)}</Badge>
-                  </div>
-                  <p className="mt-1 text-sm text-zinc-500">{expenseCategoryLabel(expense.category)} / termin {expense.dueDate}</p>
-                  <div className="mt-3 grid gap-2 rounded-xl bg-[#fffaf4] p-3 text-sm text-zinc-700 sm:grid-cols-3">
-                    <span>Koszt: <strong>{formatMoney(expense.amount)}</strong></span>
-                    <span>Oplacono: <strong>{formatMoney(expense.paidAmount)}</strong></span>
-                    <span>Zostalo: <strong>{formatMoney(remaining)}</strong></span>
-                  </div>
-                  <div className="mt-3 grid gap-2 text-sm text-zinc-600 md:grid-cols-3">
-                    <LinkedInfo label="Uslugodawca" value={vendor?.name} />
-                    <LinkedInfo label="Platnosc" value={payment?.label} />
-                    <LinkedInfo label="Dokument" value={document?.name} />
-                  </div>
-                  {(expense.fileName || expense.imageName) && <p className="mt-3 rounded-xl bg-white px-3 py-2 text-sm text-zinc-600">Zalaczniki: {[expense.fileName, expense.imageName].filter(Boolean).join(", ")}</p>}
-                  {expense.note && <p className="mt-2 text-sm leading-6 text-zinc-600">{expense.note}</p>}
-                </div>
-                <SmallButton onClick={() => markExpensePaid(expense.id)}>Oznacz oplacone</SmallButton>
-                <RowActions onEdit={() => { setDraft(expense); setEditingId(expense.id); }} onDelete={() => removeExpense(expense.id)} />
-              </PlanningCard>
-            );
-          })}
-        </div>
+        {planning.expenses.length === 0 ? <EmptyState text="Brak wydatkow. Dodaj sale, fotografa, dekoracje albo stroje." /> : (
+          <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+            <table className="w-full min-w-[1120px] border-collapse text-left text-sm">
+              <thead className="bg-[#fffaf4] text-xs uppercase tracking-[0.12em] text-zinc-500">
+                <tr>
+                  <th className="px-4 py-3">Wydatek</th>
+                  <th className="px-4 py-3">Kategoria</th>
+                  <th className="px-4 py-3 text-right">Koszt</th>
+                  <th className="px-4 py-3 text-right">Oplacono</th>
+                  <th className="px-4 py-3 text-right">Do zaplaty</th>
+                  <th className="px-4 py-3">Termin</th>
+                  <th className="px-4 py-3">Uslugodawca</th>
+                  <th className="px-4 py-3">Powiazania</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Akcje</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100">
+                {planning.expenses.map((expense) => {
+                  const vendor = planning.vendors.find((item) => item.id === expense.vendorId);
+                  const payment = planning.payments.find((item) => item.id === expense.paymentId);
+                  const document = planning.documents.find((item) => item.id === expense.documentId);
+                  const remaining = Math.max(expense.amount - expense.paidAmount, 0);
+                  return (
+                    <tr key={expense.id} className="align-top hover:bg-[#fffaf4]">
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-zinc-950">{expense.label}</p>
+                        {expense.note && <p className="mt-1 max-w-xs text-xs leading-5 text-zinc-500">{expense.note}</p>}
+                        {(expense.fileName || expense.imageName) && <p className="mt-1 text-xs text-zinc-500">Zalaczniki: {[expense.fileName, expense.imageName].filter(Boolean).join(", ")}</p>}
+                      </td>
+                      <td className="px-4 py-3 text-zinc-700">{expenseCategoryLabel(expense.category)}</td>
+                      <td className="px-4 py-3 text-right font-semibold text-zinc-950">{formatMoney(expense.amount)}</td>
+                      <td className="px-4 py-3 text-right text-zinc-700">{formatMoney(expense.paidAmount)}</td>
+                      <td className={`px-4 py-3 text-right font-semibold ${remaining > 0 ? "text-[#7b544d]" : "text-[#2f5d50]"}`}>{formatMoney(remaining)}</td>
+                      <td className="px-4 py-3 text-zinc-600">{expense.dueDate}</td>
+                      <td className="px-4 py-3 text-zinc-700">{vendor?.name ?? "Brak"}</td>
+                      <td className="px-4 py-3 text-xs leading-5 text-zinc-500">
+                        <p>Platnosc: {payment?.label ?? "brak"}</p>
+                        <p>Dokument: {document?.name ?? "brak"}</p>
+                      </td>
+                      <td className="px-4 py-3"><Badge tone={expense.status === "overdue" ? "danger" : "default"}>{expenseStatusLabel(expense.status)}</Badge></td>
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end gap-2">
+                          <SmallButton onClick={() => markExpensePaid(expense.id)}>Oplacone</SmallButton>
+                          <RowActions onEdit={() => { setDraft(expense); setEditingId(expense.id); }} onDelete={() => removeExpense(expense.id)} />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot className="border-t border-zinc-200 bg-[#fffaf4] font-semibold text-zinc-950">
+                <tr>
+                  <td className="px-4 py-3" colSpan={2}>Razem</td>
+                  <td className="px-4 py-3 text-right">{formatMoney(planned)}</td>
+                  <td className="px-4 py-3 text-right">{formatMoney(paid)}</td>
+                  <td className="px-4 py-3 text-right">{formatMoney(leftToPay)}</td>
+                  <td className="px-4 py-3" colSpan={5} />
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        )}
       </CrudLayout>
     </div>
   );
@@ -1671,10 +1817,6 @@ function expenseStatusLabel(status: PlanningExpense["status"]) {
   }[status];
 }
 
-function LinkedInfo({ label, value }: { label: string; value?: string }) {
-  return <span className="rounded-xl bg-white px-3 py-2 ring-1 ring-[#d8bd72]/15"><span className="block text-xs font-semibold uppercase tracking-wide text-zinc-400">{label}</span><span className="mt-1 block break-words font-medium text-zinc-700">{value || "brak"}</span></span>;
-}
-
 function normalizeGuestKey(guest: Guest) {
   return `${guest.firstName} ${guest.lastName}`.trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -1777,6 +1919,12 @@ function snap(value: number) {
 
 function formatMoney(value: number) {
   return `${Math.round(value).toLocaleString("pl-PL")} zl`;
+}
+
+function formatDateTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString("pl-PL", { dateStyle: "short", timeStyle: "short" });
 }
 
 const inputClass = "min-h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-[#2f7d6d] focus:ring-2 focus:ring-[#2f7d6d]/20";

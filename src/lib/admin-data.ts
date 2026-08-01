@@ -11,6 +11,7 @@ export type AdminSection =
   | "gallery"
   | "room"
   | "planning"
+  | "accounts"
   | "theme";
 
 export type ScheduleItem = {
