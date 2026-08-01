@@ -1152,7 +1152,7 @@ function AccountsManager() {
       return;
     }
     event.currentTarget.reset();
-    setMessage("Konto superadmina zostalo utworzone.");
+    setMessage(payload.email?.sent ? "Konto superadmina zostalo utworzone i e-mail z linkiem zostal wyslany." : "Konto superadmina zostalo utworzone, ale e-mail nie zostal wyslany. Sprawdz RESEND_API_KEY i EMAIL_FROM w Railway.");
     setUsers((current) => [payload.user, ...current.filter((user) => user.id !== payload.user.id)]);
   }
 
@@ -1172,7 +1172,7 @@ function AccountsManager() {
         {error && <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
       </Panel>
 
-      <CrudLayout title="Dodaj superadmina" description="Utworzone konto loguje sie przez /login. Haslo musi miec minimum 8 znakow." form={
+      <CrudLayout title="Dodaj superadmina" description="Po utworzeniu konta aplikacja wysyla e-mail z linkiem do logowania. Haslo musi miec minimum 8 znakow." form={
         <form onSubmit={createUser} className="grid gap-3">
           <Field label="Imie / nazwa"><input className={inputClass} name="name" placeholder="Aleksandra" required /></Field>
           <Field label="Email"><input className={inputClass} name="email" type="email" placeholder="osoba@example.com" required /></Field>

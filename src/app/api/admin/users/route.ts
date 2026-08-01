@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sendAccountCreatedEmail } from "@/lib/email";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 const createUserSchema = z.object({
@@ -44,6 +45,14 @@ export async function POST(request: Request) {
   });
 
   if (error) return Response.json({ error: error.message }, { status: 400 });
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const emailResult = await sendAccountCreatedEmail({
+    to: payload.data.email,
+    name: payload.data.name,
+    appUrl: siteUrl,
+    loginUrl: `${siteUrl}/login`,
+  });
+
   return Response.json({
     user: {
       id: data.user.id,
@@ -53,5 +62,6 @@ export async function POST(request: Request) {
       createdAt: data.user.created_at,
       lastSignInAt: data.user.last_sign_in_at,
     },
+    email: emailResult,
   });
 }
