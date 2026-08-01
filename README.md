@@ -61,7 +61,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_WEDDING_SLUG=nasze-wesele
+NEXT_PUBLIC_WEDDING_SLUG=aleksandra-pawel-2028
 ```
 
 4. W Supabase SQL Editor uruchom migracje:
@@ -73,11 +73,13 @@ supabase/migrations/202606030002_superadmin_sales_security.sql
 supabase/migrations/202608010001_production_app_completion.sql
 ```
 
-5. Nastepnie uruchom seed:
+5. Nastepnie uruchom czysty seed produkcyjny:
 
 ```text
-supabase/seed.sql
+supabase/seed-production.sql
 ```
+
+`supabase/seed.sql` zostaje tylko jako wiekszy seed demo.
 
 Szczegoly modelu danych sa w `docs/database.md`.
 

@@ -416,7 +416,7 @@ export const demoWeddingAdminData: WeddingAdminData = {
     { id: "schedule-first-dance", time: "17:30", title: "Pierwszy taniec", place: "Parkiet", owner: "DJ", status: "confirmed" },
     { id: "schedule-cake", time: "20:00", title: "Tort weselny", place: "Parkiet", owner: "Cukiernia", status: "planned" },
   ],
-  guests: demoGuests,
+  guests: [],
   tables: demoTables,
   roomElements: [
     { id: "dance", label: "Parkiet", type: "dance", x: 38, y: 38, w: 24, h: 18 },
@@ -434,47 +434,15 @@ export const demoWeddingAdminData: WeddingAdminData = {
     { id: "faq-transport", question: "Czy bedzie transport powrotny?", answer: "Tak, autobusy odjezdzaja o 02:00 i 04:00.", active: true },
     { id: "faq-photos", question: "Gdzie wrzucac zdjecia?", answer: "Uzyj przycisku Dodaj zdjecia albo kodu QR na stoliku.", active: true },
   ],
-  gallery: [
-    { id: "photo-1", title: "Przymiarka sali", author: "Organizator", status: "approved", category: "details" },
-    { id: "photo-2", title: "Zdjecie od goscia", author: "Anna", status: "pending", category: "party" },
-  ],
+  gallery: [],
   planning: {
-    budgetTarget: 95000,
-    tasks: [
-      { id: "task-docs", title: "Zlozyc dokumenty do USC/parafii", category: "formalities", owner: "Anna", dueDate: "2026-05-20", status: "doing", note: "Potrzebne akty chrztu i zaswiadczenie z USC." },
-      { id: "task-menu", title: "Potwierdzic finalne menu i alergie", category: "venue", owner: "Michal", dueDate: "2026-06-05", status: "todo", note: "Uwzglednic diety z listy gosci." },
-      { id: "task-transport", title: "Wyslac godziny transportu gosciom", category: "guests", owner: "Swiadek", dueDate: "2026-06-12", status: "todo", note: "Dwa kursy powrotne: 02:00 i 04:00." },
-      { id: "task-decor", title: "Odebrac winietki i plan sali", category: "decor", owner: "Wedding planner", dueDate: "2026-06-17", status: "blocked", note: "Czeka na finalna liste stolikow." },
-    ],
-    vendors: [
-      { id: "vendor-venue", category: "Sala weselna", name: "Dworek Pod Lipami", contactName: "Pani Katarzyna", phone: "+48 501 222 333", email: "eventy@dworek.test", status: "booked", contractStatus: "signed", totalCost: 52000, depositPaid: 12000, paymentDueDate: "2026-06-10", notes: "Noclegi i sniadanie rozliczane osobno." },
-      { id: "vendor-photo", category: "Fotograf", name: "Studio Jasne Kadry", contactName: "Marek", phone: "+48 602 111 222", email: "kontakt@jasnekadry.test", status: "booked", contractStatus: "signed", totalCost: 7800, depositPaid: 2000, paymentDueDate: "2026-06-20", notes: "Reportaz do oczepin plus sesja plenerowa." },
-      { id: "vendor-dj", category: "DJ / muzyka", name: "DJ Vinylove", contactName: "Tomek", phone: "+48 608 333 444", email: "dj@vinylove.test", status: "booked", contractStatus: "draft", totalCost: 6500, depositPaid: 1000, paymentDueDate: "2026-06-18", notes: "Dostarczyc liste piosenek z ankiety." },
-      { id: "vendor-florist", category: "Dekoracje", name: "Piwonia Studio", contactName: "Ola", phone: "+48 733 444 555", email: "hello@piwonia.test", status: "shortlisted", contractStatus: "missing", totalCost: 9200, depositPaid: 0, paymentDueDate: "2026-05-30", notes: "Wycena: bukiet, butonierki, sala, kosciol." },
-    ],
-    expenses: [
-      { id: "expense-venue", label: "Sala weselna i menu", category: "venue", vendorId: "vendor-venue", paymentId: "pay-venue-final", documentId: "doc-venue-contract", amount: 52000, paidAmount: 12000, dueDate: "2026-06-10", status: "deposit-paid", fileName: "umowa-dworek.pdf", imageName: "sala-inspiracja.jpg", note: "Cena obejmuje sale, menu, serwis i podstawowe napoje." },
-      { id: "expense-photo", label: "Fotograf", category: "photo", vendorId: "vendor-photo", paymentId: "pay-photo-final", documentId: "", amount: 7800, paidAmount: 2000, dueDate: "2026-06-20", status: "deposit-paid", fileName: "oferta-fotograf.pdf", imageName: "reportaz-slubny.jpg", note: "Reportaz do oczepin i sesja plenerowa." },
-      { id: "expense-dj", label: "DJ i naglosnienie", category: "music", vendorId: "vendor-dj", paymentId: "pay-dj-deposit", documentId: "doc-dj-contract", amount: 6500, paidAmount: 1000, dueDate: "2026-06-18", status: "deposit-paid", fileName: "umowa-dj-draft.pdf", imageName: "", note: "Do ustalenia lista utworow i godzina zakonczenia." },
-      { id: "expense-decor", label: "Dekoracje i kwiaty", category: "decor", vendorId: "vendor-florist", paymentId: "pay-florist-deposit", documentId: "", amount: 9200, paidAmount: 0, dueDate: "2026-05-30", status: "planned", fileName: "wycena-dekoracje.pdf", imageName: "moodboard-piwonie.jpg", note: "Piwonie, zielen, krem i zlote akcenty." },
-    ],
-    payments: [
-      { id: "pay-venue-final", vendorId: "vendor-venue", label: "Doplata za sale", amount: 40000, dueDate: "2026-06-10", paid: false, method: "przelew" },
-      { id: "pay-photo-final", vendorId: "vendor-photo", label: "Fotograf - platnosc koncowa", amount: 5800, dueDate: "2026-06-20", paid: false, method: "gotowka" },
-      { id: "pay-dj-deposit", vendorId: "vendor-dj", label: "Zaliczka DJ", amount: 1000, dueDate: "2026-03-20", paid: true, method: "przelew" },
-      { id: "pay-florist-deposit", vendorId: "vendor-florist", label: "Zaliczka dekoracje", amount: 2500, dueDate: "2026-05-30", paid: false, method: "przelew" },
-    ],
-    documents: [
-      { id: "doc-venue-contract", name: "Umowa z sala", type: "contract", vendorId: "vendor-venue", status: "signed", dueDate: "2026-02-10", fileName: "umowa-dworek.pdf", note: "Podpisana przez obie strony." },
-      { id: "doc-dj-contract", name: "Umowa z DJ", type: "contract", vendorId: "vendor-dj", status: "uploaded", dueDate: "2026-05-28", fileName: "umowa-dj-draft.pdf", note: "Do podpisu po korekcie godzin." },
-      { id: "doc-menu", name: "Finalne menu i alergeny", type: "menu", vendorId: "vendor-venue", status: "needed", dueDate: "2026-06-05", fileName: "", note: "Dopisac dania dla dzieci." },
-      { id: "doc-usc", name: "Dokumenty formalne", type: "permit", vendorId: "", status: "needed", dueDate: "2026-05-20", fileName: "", note: "Sprawdzic komplet dokumentow." },
-    ],
-    attachments: [
-      { id: "att-venue", title: "Skan podpisanej umowy z sala", fileName: "umowa-dworek.pdf", relatedType: "vendor", relatedId: "vendor-venue", uploadedAt: "2026-02-10", note: "Wersja podpisana." },
-      { id: "att-menu", title: "Robocze menu", fileName: "menu-wesele-v2.pdf", relatedType: "document", relatedId: "doc-menu", uploadedAt: "2026-05-18", note: "Do zatwierdzenia alergeny." },
-      { id: "att-decor", title: "Inspiracje dekoracji", fileName: "moodboard-piwonie.zip", relatedType: "task", relatedId: "task-decor", uploadedAt: "2026-05-12", note: "Kolory: zielen, krem, zloto." },
-    ],
+    budgetTarget: 0,
+    tasks: [],
+    vendors: [],
+    expenses: [],
+    payments: [],
+    documents: [],
+    attachments: [],
   },
   theme: {
     coupleName: "Aleksandra i Pawel",
@@ -553,7 +521,7 @@ export function normalizeWeddingAdminData(raw: unknown): WeddingAdminData {
     tables?: Array<Partial<TablePlan> & { shape?: string; capacity?: number }>;
   };
 
-  const tables = Array.isArray(value.tables) && value.tables.length >= 5
+  const tables = Array.isArray(value.tables)
     ? value.tables.map((table, index) => ({
         ...demoTables[index % demoTables.length],
         ...table,
@@ -568,7 +536,7 @@ export function normalizeWeddingAdminData(raw: unknown): WeddingAdminData {
       }))
     : demoTables;
 
-  const guests = Array.isArray(value.guests) && value.guests.length >= 20
+  const guests = Array.isArray(value.guests)
     ? value.guests.map((guest, index) => {
         const legacyGuest = guest as Partial<Guest> & { name?: string; party?: string };
         const fullName = legacyGuest.name ?? guestFullName({ firstName: guest.firstName ?? "", lastName: guest.lastName ?? "" });
