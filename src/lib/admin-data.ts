@@ -559,7 +559,7 @@ export function normalizeWeddingAdminData(raw: unknown): WeddingAdminData {
           note: guest.note ?? "",
           token: guest.token ?? createAdminId("token"),
         };
-      }).filter((guest) => guest.firstName && guest.lastName)
+      }).filter((guest) => guest.firstName || guest.lastName)
     : demoGuests;
 
   return {

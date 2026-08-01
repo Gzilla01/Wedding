@@ -52,6 +52,7 @@ const sections: Array<{ id: AdminSection; label: string }> = [
   { id: "publish", label: "Publikacja" },
   { id: "gallery", label: "Galeria" },
   { id: "room", label: "Mapa sali" },
+  { id: "planning", label: "Planowanie" },
 ];
 
 const statusLabel: Record<string, string> = {
