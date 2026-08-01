@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const protectedPrefixes = ["/sprzedaz", "/start", "/admin", "/app", "/zamowienie"];
-const protectedApiPrefixes = ["/api/admin", "/api/sales/checkout", "/api/sales/instances"];
+const protectedPrefixes = ["/admin"];
+const protectedApiPrefixes = ["/api/admin"];
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 90;
@@ -58,5 +58,5 @@ function isProtectedPath(pathname: string) {
 }
 
 export const config = {
-  matcher: ["/sprzedaz/:path*", "/start/:path*", "/admin/:path*", "/api/:path*"],
+  matcher: ["/admin/:path*", "/api/:path*"],
 };

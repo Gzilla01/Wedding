@@ -327,7 +327,7 @@ function FaqManager({ items, onChange }: { items: FaqItem[]; onChange: (items: F
 
 function PublicationManager({ settings, wedding, onChange }: { settings: ThemeSettings; wedding: WeddingInfo; onChange: (settings: ThemeSettings) => void }) {
   const [draft, setDraft] = useState(settings);
-  const publicUrl = typeof window === "undefined" ? "/w/aleksandra-pawel-2028" : `${window.location.origin}/w/${draft.coupleName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "aleksandra-pawel-2028"}`;
+  const publicUrl = typeof window === "undefined" ? "/" : window.location.origin;
   return (
     <Panel title="Publikacja i dostep" description="Ostatni krok przed wyslaniem linku gosciom i drukiem QR.">
       <form onSubmit={(event) => { event.preventDefault(); onChange(draft); }} className="grid gap-4">
@@ -1579,7 +1579,7 @@ function ThemeManager({ settings, onChange, onReset }: { settings: ThemeSettings
           </div>
           {draft.accessMode === "code" && <p className="mt-3 rounded-xl bg-white px-3 py-2 text-sm text-zinc-600">Tekst do zaproszenia: Kod do strony weselnej: <strong>{draft.weddingCode || "AP2028"}</strong></p>}
         </div>
-        <div className="flex flex-wrap gap-2"><button type="submit" className={primaryButtonClass}>Zapisz ustawienia</button><SmallButton onClick={onReset}>Przywroc demo</SmallButton></div>
+        <div className="flex flex-wrap gap-2"><button type="submit" className={primaryButtonClass}>Zapisz ustawienia</button><SmallButton onClick={onReset}>Przywroc ustawienia poczatkowe</SmallButton></div>
       </form>
     </Panel>
   );

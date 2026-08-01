@@ -11,7 +11,7 @@ export function SongRequestForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG ||
     fetch(`/api/public/weddings/${encodeURIComponent(slug)}/songs`, { cache: "no-store" })
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((payload) => setSongs(payload.songs ?? []))
-      .catch(() => setSongs([{ id: "demo-1", title: "Dawid Podsiadlo - Malomiasteczkowy", votes: 0 }, { id: "demo-2", title: "ABBA - Dancing Queen", votes: 0 }]));
+      .catch(() => setSongs([]));
   }, [slug]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
