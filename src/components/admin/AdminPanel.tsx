@@ -1104,6 +1104,7 @@ type AdminUser = {
   email: string;
   name: string;
   role: "superadmin";
+  mustChangePassword: boolean;
   createdAt: string;
   lastSignInAt?: string | null;
 };
@@ -1152,7 +1153,7 @@ function AccountsManager() {
       return;
     }
     event.currentTarget.reset();
-    setMessage(payload.email?.sent ? "Konto superadmina zostalo utworzone i e-mail z linkiem zostal wyslany." : "Konto superadmina zostalo utworzone, ale e-mail nie zostal wyslany. Sprawdz RESEND_API_KEY i EMAIL_FROM w Railway.");
+    setMessage(payload.email?.sent ? "Konto superadmina zostalo utworzone. E-mail z linkiem i haslem startowym zostal wyslany." : "Konto superadmina zostalo utworzone, ale e-mail nie zostal wyslany. Sprawdz RESEND_API_KEY i EMAIL_FROM w Railway.");
     setUsers((current) => [payload.user, ...current.filter((user) => user.id !== payload.user.id)]);
   }
 
@@ -1172,7 +1173,7 @@ function AccountsManager() {
         {error && <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
       </Panel>
 
-      <CrudLayout title="Dodaj superadmina" description="Po utworzeniu konta aplikacja wysyla e-mail z linkiem do logowania. Haslo musi miec minimum 8 znakow." form={
+      <CrudLayout title="Dodaj superadmina" description="Po utworzeniu konta aplikacja wysyla e-mail z linkiem i haslem startowym. Przy pierwszym logowaniu wymusi ustawienie nowego hasla." form={
         <form onSubmit={createUser} className="grid gap-3">
           <Field label="Imie / nazwa"><input className={inputClass} name="name" placeholder="Aleksandra" required /></Field>
           <Field label="Email"><input className={inputClass} name="email" type="email" placeholder="osoba@example.com" required /></Field>
@@ -1187,7 +1188,7 @@ function AccountsManager() {
                 <th className="px-4 py-3">Nazwa</th>
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Rola</th>
-                <th className="px-4 py-3">Utworzone</th>
+                <th className="px-4 py-3">Status hasla</th>
                 <th className="px-4 py-3">Ostatnie logowanie</th>
               </tr>
             </thead>
@@ -1197,7 +1198,7 @@ function AccountsManager() {
                   <td className="px-4 py-3 font-semibold text-zinc-900">{user.name}</td>
                   <td className="px-4 py-3 text-zinc-600">{user.email}</td>
                   <td className="px-4 py-3"><Badge>Superadmin</Badge></td>
-                  <td className="px-4 py-3 text-zinc-600">{formatDateTime(user.createdAt)}</td>
+                  <td className="px-4 py-3">{user.mustChangePassword ? <Badge tone="warning">Do zmiany</Badge> : <Badge>Ustawione</Badge>}</td>
                   <td className="px-4 py-3 text-zinc-600">{user.lastSignInAt ? formatDateTime(user.lastSignInAt) : "Jeszcze nie"}</td>
                 </tr>
               ))}
@@ -1922,8 +1923,9 @@ function BudgetMetric({ label, value, tone }: { label: string; value: number; to
   );
 }
 
-function Badge({ children, tone = "default" }: { children: React.ReactNode; tone?: "default" | "danger" }) {
-  return <span className={`inline-flex h-7 items-center justify-center rounded-full px-3 text-xs font-semibold ${tone === "danger" ? "bg-red-50 text-red-700" : "bg-[#e0f0eb] text-[#1f5f52]"}`}>{children}</span>;
+function Badge({ children, tone = "default" }: { children: React.ReactNode; tone?: "default" | "danger" | "warning" }) {
+  const toneClass = tone === "danger" ? "bg-red-50 text-red-700" : tone === "warning" ? "bg-amber-50 text-amber-800" : "bg-[#e0f0eb] text-[#1f5f52]";
+  return <span className={`inline-flex h-7 items-center justify-center rounded-full px-3 text-xs font-semibold ${toneClass}`}>{children}</span>;
 }
 
 function SmallButton({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {

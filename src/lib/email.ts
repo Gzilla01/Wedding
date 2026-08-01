@@ -1,11 +1,12 @@
 export type AccountCreatedEmail = {
   to: string;
   name: string;
+  temporaryPassword: string;
   loginUrl: string;
   appUrl: string;
 };
 
-export async function sendAccountCreatedEmail({ to, name, loginUrl, appUrl }: AccountCreatedEmail) {
+export async function sendAccountCreatedEmail({ to, name, temporaryPassword, loginUrl, appUrl }: AccountCreatedEmail) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { sent: false, reason: "RESEND_API_KEY is not configured" };
 
@@ -19,7 +20,9 @@ export async function sendAccountCreatedEmail({ to, name, loginUrl, appUrl }: Ac
       <p>Utworzono dla Ciebie konto superadmina w aplikacji weselnej Aleksandry i Pawla.</p>
       <p><strong>Adres aplikacji:</strong> <a href="${appUrl}">${appUrl}</a></p>
       <p><strong>Logowanie do panelu:</strong> <a href="${loginUrl}">${loginUrl}</a></p>
-      <p>Loginem jest ten adres e-mail. Haslo przekaze administrator, ktory utworzyl konto.</p>
+      <p><strong>Login:</strong> ${escapeHtml(to)}</p>
+      <p><strong>Haslo startowe:</strong> ${escapeHtml(temporaryPassword)}</p>
+      <p>Po pierwszym logowaniu aplikacja od razu poprosi o ustawienie nowego hasla.</p>
       <p style="margin-top:24px;color:#6b7280;font-size:13px">Jesli nie spodziewasz sie tego maila, zignoruj wiadomosc.</p>
     </div>
   `;
@@ -28,7 +31,9 @@ export async function sendAccountCreatedEmail({ to, name, loginUrl, appUrl }: Ac
     "Utworzono dla Ciebie konto superadmina w aplikacji weselnej Aleksandry i Pawla.",
     `Adres aplikacji: ${appUrl}`,
     `Logowanie do panelu: ${loginUrl}`,
-    "Loginem jest ten adres e-mail. Haslo przekaze administrator, ktory utworzyl konto.",
+    `Login: ${to}`,
+    `Haslo startowe: ${temporaryPassword}`,
+    "Po pierwszym logowaniu aplikacja od razu poprosi o ustawienie nowego hasla.",
   ].join("\n\n");
 
   const response = await fetch("https://api.resend.com/emails", {

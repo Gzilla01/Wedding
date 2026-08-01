@@ -28,7 +28,8 @@ export default function LoginPage() {
       setError(payload?.error ?? "Nie udalo sie zalogowac.");
       return;
     }
-    router.replace("/admin");
+    const payload = await response.json().catch(() => null);
+    router.replace(payload?.requiresPasswordChange ? "/login/change-password" : "/admin");
     router.refresh();
   }
 

@@ -4,9 +4,11 @@ export const ADMIN_SESSION_COOKIE = "wedding_admin_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 12;
 
 export type AdminSession = {
+  userId?: string;
   email: string;
   name: string;
   role: "superadmin";
+  mustChangePassword?: boolean;
   exp: number;
 };
 

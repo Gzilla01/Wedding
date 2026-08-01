@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { z } from "zod";
+import { ADMIN_SESSION_COOKIE, verifyAdminSessionCookie } from "@/lib/admin-auth";
 import { sendAccountCreatedEmail } from "@/lib/email";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -9,6 +11,9 @@ const createUserSchema = z.object({
 });
 
 export async function GET() {
+  const session = verifyAdminSessionCookie((await cookies()).get(ADMIN_SESSION_COOKIE)?.value);
+  if (!session || session.mustChangePassword) return Response.json({ error: "Brak dostepu." }, { status: 401 });
+
   const supabase = getSupabaseAdminClient();
   if (!supabase) return Response.json({ error: "Supabase service role is not configured." }, { status: 503 });
 
@@ -23,6 +28,7 @@ export async function GET() {
         email: user.email,
         name: user.user_metadata?.name || user.email,
         role: user.app_metadata?.role || "superadmin",
+        mustChangePassword: user.user_metadata?.must_change_password === true,
         createdAt: user.created_at,
         lastSignInAt: user.last_sign_in_at,
       })),
@@ -30,6 +36,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = verifyAdminSessionCookie((await cookies()).get(ADMIN_SESSION_COOKIE)?.value);
+  if (!session || session.mustChangePassword) return Response.json({ error: "Brak dostepu." }, { status: 401 });
+
   const supabase = getSupabaseAdminClient();
   if (!supabase) return Response.json({ error: "Supabase service role is not configured." }, { status: 503 });
 
@@ -41,7 +50,7 @@ export async function POST(request: Request) {
     password: payload.data.password,
     email_confirm: true,
     app_metadata: { role: "superadmin" },
-    user_metadata: { name: payload.data.name },
+    user_metadata: { name: payload.data.name, must_change_password: true },
   });
 
   if (error) return Response.json({ error: error.message }, { status: 400 });
@@ -49,6 +58,7 @@ export async function POST(request: Request) {
   const emailResult = await sendAccountCreatedEmail({
     to: payload.data.email,
     name: payload.data.name,
+    temporaryPassword: payload.data.password,
     appUrl: siteUrl,
     loginUrl: `${siteUrl}/login`,
   });
@@ -59,6 +69,7 @@ export async function POST(request: Request) {
       email: data.user.email,
       name: data.user.user_metadata?.name || payload.data.name,
       role: "superadmin",
+      mustChangePassword: true,
       createdAt: data.user.created_at,
       lastSignInAt: data.user.last_sign_in_at,
     },

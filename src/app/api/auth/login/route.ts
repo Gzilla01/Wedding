@@ -31,12 +31,15 @@ export async function POST(request: Request) {
 
   const role = data.user.app_metadata?.role;
   if (role !== "superadmin") return NextResponse.json({ error: "Konto nie ma uprawnien superadmina." }, { status: 403 });
+  const mustChangePassword = data.user.user_metadata?.must_change_password === true;
 
   return loginResponse({
+    userId: data.user.id,
     email: data.user.email || email,
     name: String(data.user.user_metadata?.name || data.user.email || "Superadmin"),
     role: "superadmin",
-  });
+    mustChangePassword,
+  }, mustChangePassword);
 }
 
 function isBootstrapAdmin(email: string, password: string) {
@@ -45,8 +48,8 @@ function isBootstrapAdmin(email: string, password: string) {
   return Boolean(expected && password === expected && (normalized === "admin" || normalized === "admin@aleksandrapawel-2028.pl"));
 }
 
-function loginResponse(session: { email: string; name: string; role: "superadmin" }) {
-  const response = NextResponse.json({ ok: true, user: session });
+function loginResponse(session: { userId?: string; email: string; name: string; role: "superadmin"; mustChangePassword?: boolean }, requiresPasswordChange = false) {
+  const response = NextResponse.json({ ok: true, requiresPasswordChange, user: session });
   response.cookies.set(ADMIN_SESSION_COOKIE, createAdminSessionCookie(session), adminCookieOptions());
   return response;
 }
