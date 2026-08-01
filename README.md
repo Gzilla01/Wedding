@@ -35,11 +35,12 @@ SUPABASE_STORAGE_BUCKET=wedding-media
 INTERNAL_TOOLS_PASSWORD=...
 RESEND_API_KEY=...
 EMAIL_FROM=Aleksandra i Pawel <powiadomienia@twoja-domena.pl>
+EMAIL_REPLY_TO=gradit.consulting@gmail.com
 ```
 
 Nie commituj prawdziwych kluczy Supabase ani hasla panelu. Klucz `service_role` trzymaj tylko w Railway/Supabase secrets.
 
-Do wysylki maili z linkiem do nowego konta ustaw w Railway `RESEND_API_KEY` oraz `EMAIL_FROM`.
+Do wysylki maili z linkiem do nowego konta ustaw w Railway `RESEND_API_KEY`, `EMAIL_FROM` oraz opcjonalnie `EMAIL_REPLY_TO`.
 
 ## Supabase
 

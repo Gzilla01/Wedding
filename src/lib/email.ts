@@ -10,6 +10,7 @@ export async function sendAccountCreatedEmail({ to, name, loginUrl, appUrl }: Ac
   if (!apiKey) return { sent: false, reason: "RESEND_API_KEY is not configured" };
 
   const from = process.env.EMAIL_FROM || "Aleksandra i Pawel <onboarding@resend.dev>";
+  const replyTo = process.env.EMAIL_REPLY_TO;
   const subject = "Dostep do panelu wesela Aleksandry i Pawla";
   const html = `
     <div style="font-family:Arial,sans-serif;line-height:1.6;color:#1f2937">
@@ -36,7 +37,7 @@ export async function sendAccountCreatedEmail({ to, name, loginUrl, appUrl }: Ac
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from, to, subject, html, text }),
+    body: JSON.stringify({ from, to, subject, html, text, reply_to: replyTo || undefined }),
   });
 
   if (!response.ok) {
