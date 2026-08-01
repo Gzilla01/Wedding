@@ -1,58 +1,4 @@
--- Clean production seed for Aleksandra & Pawel.
--- Generated from AP_WESELE.xlsx.
--- Run after all migrations in Supabase SQL Editor.
-
-delete from public.weddings
-where slug in ('aleksandra-pawel-2028', 'nasze-wesele');
-
-insert into public.weddings (
-  id,
-  slug,
-  couple_names,
-  wedding_date,
-  ceremony_time,
-  reception_time,
-  ceremony_location,
-  reception_location,
-  hero_message,
-  rsvp_deadline,
-  contact_email,
-  contact_phone,
-  is_published,
-  owner_email,
-  public_url,
-  plan_id,
-  storage_limit_mb,
-  video_limit_minutes,
-  expires_at,
-  privacy_level
-) values (
-  'aaaaaaaa-2028-4000-8000-000000000001',
-  'aleksandra-pawel-2028',
-  'Aleksandra i Pawel',
-  '2028-06-17',
-  '14:00',
-  '16:00',
-  'Miejsce ceremonii do uzupelnienia',
-  'Sala weselna do uzupelnienia',
-  'Cieszymy sie, ze bedziesz z nami. Tu znajdziesz najwazniejsze informacje o naszym weselu.',
-  '2028-05-31',
-  'kontakt@aleksandrapawel-2028.pl',
-  '+48 500 100 200',
-  true,
-  'kontakt@aleksandrapawel-2028.pl',
-  '/',
-  'live',
-  10240,
-  30,
-  '2028-12-31 23:59:59+01',
-  'wedding_code'
-);
-
-insert into public.wedding_admin_snapshots (wedding_id, data)
-values (
-  'aaaaaaaa-2028-4000-8000-000000000001',
-  '{
+{
   "wedding": {
     "bride": "Aleksandra",
     "groom": "Pawel",
@@ -2963,7 +2909,4 @@ values (
     "galleryModeration": true,
     "showWholeRoomToGuests": false
   }
-}'::jsonb
-)
-on conflict (wedding_id)
-do update set data = excluded.data, updated_at = now();
+}
