@@ -1320,39 +1320,58 @@ function BudgetManager({ planning, onChange }: { planning: PlanningData; onChang
     onChange({ ...planning, expenses: planning.expenses.filter((expense) => expense.id !== id) });
   }
 
+  function editExpense(expense: PlanningExpense) {
+    setDraft(expense);
+    setEditingId(expense.id);
+    document.getElementById("expense-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <div className="grid gap-4">
       <Panel title="Budzet wesela" description="Ustal budzet, dodawaj wydatki i lacz je z zaliczkami, dokumentami oraz umowami.">
-        <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
-          <Field label="Budzet calkowity"><input className={inputClass} type="number" min={0} value={planning.budgetTarget} onChange={(event) => setBudgetTarget(Number(event.target.value))} /></Field>
+        <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)] xl:items-start">
+          <div className="rounded-2xl border border-[#d8bd72]/25 bg-[#fffaf4] p-4">
+            <Field label="Budzet calkowity"><input className={inputClass} type="number" min={0} value={planning.budgetTarget} onChange={(event) => setBudgetTarget(Number(event.target.value))} /></Field>
+            <p className="mt-3 text-xs leading-5 text-zinc-500">To jest limit kontrolny do porownywania z kosztami z tabeli.</p>
+          </div>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Metric label="Planowane wydatki" value={formatMoney(planned)} />
-            <Metric label="Oplacone" value={formatMoney(paid)} />
-            <Metric label="Pozostalo" value={formatMoney(leftToPay)} />
+            <BudgetMetric label="Planowane" value={planned} tone="neutral" />
+            <BudgetMetric label="Oplacone" value={paid} tone="paid" />
+            <BudgetMetric label="Do zaplaty" value={leftToPay} tone={leftToPay > 0 ? "due" : "paid"} />
           </div>
         </div>
-        <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {categories.map((category) => {
             const amount = planning.expenses.filter((expense) => expense.category === category).reduce((sum, expense) => sum + expense.amount, 0);
-            return <div key={category} className="rounded-2xl bg-[#fffaf4] px-4 py-3 text-sm"><p className="font-semibold">{expenseCategoryLabel(category)}</p><p className="mt-1 text-[#2f5d50]">{formatMoney(amount)}</p></div>;
+            const count = planning.expenses.filter((expense) => expense.category === category).length;
+            return (
+              <div key={category} className="rounded-2xl border border-[#d8bd72]/20 bg-[#fffaf4] px-4 py-3 text-sm">
+                <p className="font-semibold text-zinc-900">{expenseCategoryLabel(category)}</p>
+                <p className="mt-1 text-lg font-semibold text-[#2f5d50]">{formatMoney(amount)}</p>
+                <p className="mt-1 text-xs text-zinc-500">{count} pozycji</p>
+              </div>
+            );
           })}
         </div>
       </Panel>
 
-      <CrudLayout title={editingId ? "Edytuj wydatek" : "Dodaj wydatek"} description="Koszt moze byc powiazany z uslugodawca, zaliczka/platnoscia, dokumentem albo umowa." form={
-        <form onSubmit={submit} className="grid gap-3">
-          <Field label="Nazwa wydatku"><input className={inputClass} value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} placeholder="np. Tort weselny" /></Field>
-          <div className="grid gap-3 sm:grid-cols-2">
+      <Panel title={editingId ? `Edytujesz: ${draft.label || "wydatek"}` : "Dodaj wydatek"} description={editingId ? "Zmien pola i zapisz, zeby zaktualizowac wybrany wiersz w tabeli." : "Dodaj nowa pozycje kosztowa. Istniejace wydatki edytujesz przyciskiem w tabeli."}>
+        <form id="expense-form" onSubmit={submit} className="grid gap-4">
+          {editingId && <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">Tryb edycji aktywny. Zapis zmieni tylko ten jeden wydatek.</p>}
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_repeat(2,minmax(0,0.8fr))]">
+            <Field label="Nazwa wydatku"><input className={inputClass} value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} placeholder="np. Tort weselny" /></Field>
             <Field label="Kategoria"><select className={inputClass} value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value as PlanningExpense["category"] })}>{expenseCategoryOptions.map((option) => <option key={option} value={option}>{expenseCategoryLabel(option)}</option>)}</select></Field>
             <Field label="Status"><select className={inputClass} value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value as PlanningExpense["status"] })}><option value="planned">Planowany</option><option value="deposit-paid">Zaliczka zaplacona</option><option value="paid">Oplacony</option><option value="overdue">Po terminie</option></select></Field>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
             <Field label="Kwota calkowita"><input className={inputClass} type="number" min={0} value={draft.amount} onChange={(e) => setDraft({ ...draft, amount: Number(e.target.value) })} /></Field>
             <Field label="Oplacono / zaliczki"><input className={inputClass} type="number" min={0} value={draft.paidAmount} onChange={(e) => setDraft({ ...draft, paidAmount: Number(e.target.value) })} /></Field>
             <Field label="Termin"><input className={inputClass} type="date" value={draft.dueDate} onChange={(e) => setDraft({ ...draft, dueDate: e.target.value })} /></Field>
             <Field label="Uslugodawca"><select className={inputClass} value={draft.vendorId} onChange={(e) => setDraft({ ...draft, vendorId: e.target.value })}><option value="">Bez powiazania</option>{planning.vendors.map((vendor) => <option key={vendor.id} value={vendor.id}>{vendor.name}</option>)}</select></Field>
-            <Field label="Platnosc / zaliczka"><select className={inputClass} value={draft.paymentId} onChange={(e) => setDraft({ ...draft, paymentId: e.target.value })}><option value="">Bez powiazania</option>{planning.payments.map((payment) => <option key={payment.id} value={payment.id}>{payment.label}</option>)}</select></Field>
-            <Field label="Dokument / umowa"><select className={inputClass} value={draft.documentId} onChange={(e) => setDraft({ ...draft, documentId: e.target.value })}><option value="">Bez powiazania</option>{planning.documents.map((document) => <option key={document.id} value={document.id}>{document.name}</option>)}</select></Field>
+            <Field label="Platnosc"><select className={inputClass} value={draft.paymentId} onChange={(e) => setDraft({ ...draft, paymentId: e.target.value })}><option value="">Bez powiazania</option>{planning.payments.map((payment) => <option key={payment.id} value={payment.id}>{payment.label}</option>)}</select></Field>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,1.4fr)]">
+            <Field label="Dokument / umowa"><select className={inputClass} value={draft.documentId} onChange={(e) => setDraft({ ...draft, documentId: e.target.value })}><option value="">Bez powiazania</option>{planning.documents.map((document) => <option key={document.id} value={document.id}>{document.name}</option>)}</select></Field>
             <Field label="Plik kosztu"><input className={inputClass} type="file" onChange={(e) => setDraft({ ...draft, fileName: e.target.files?.[0]?.name ?? draft.fileName })} /></Field>
             <Field label="Fotka / inspiracja"><input className={inputClass} type="file" accept="image/*" onChange={(e) => setDraft({ ...draft, imageName: e.target.files?.[0]?.name ?? draft.imageName })} /></Field>
           </div>
@@ -1360,7 +1379,9 @@ function BudgetManager({ planning, onChange }: { planning: PlanningData; onChang
           <Field label="Notatka"><textarea className={inputClass} value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value })} /></Field>
           <FormActions editing={Boolean(editingId)} onCancel={() => { setDraft(emptyPlanningExpense); setEditingId(null); }} />
         </form>
-      }>
+      </Panel>
+
+      <Panel title="Tabela wydatkow" description="Kazdy wiersz mozna edytowac. Kliknij Edytuj, zmien dane w formularzu powyzej i zapisz.">
         {planning.expenses.length === 0 ? <EmptyState text="Brak wydatkow. Dodaj sale, fotografa, dekoracje albo stroje." /> : (
           <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
             <table className="w-full min-w-[1120px] border-collapse text-left text-sm">
@@ -1403,9 +1424,10 @@ function BudgetManager({ planning, onChange }: { planning: PlanningData; onChang
                       </td>
                       <td className="px-4 py-3"><Badge tone={expense.status === "overdue" ? "danger" : "default"}>{expenseStatusLabel(expense.status)}</Badge></td>
                       <td className="px-4 py-3">
-                        <div className="flex justify-end gap-2">
-                          <SmallButton onClick={() => markExpensePaid(expense.id)}>Oplacone</SmallButton>
-                          <RowActions onEdit={() => { setDraft(expense); setEditingId(expense.id); }} onDelete={() => removeExpense(expense.id)} />
+                        <div className="flex flex-col items-stretch justify-end gap-2">
+                          <button type="button" onClick={() => editExpense(expense)} className="h-9 rounded-md bg-[#2f5d50] px-3 text-xs font-semibold text-white transition hover:bg-[#254b40]">Edytuj</button>
+                          <button type="button" onClick={() => markExpensePaid(expense.id)} className="h-9 rounded-md border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100">Oplacone</button>
+                          <button type="button" onClick={() => removeExpense(expense.id)} className="h-9 rounded-md border border-red-200 bg-red-50 px-3 text-xs font-semibold text-red-700 transition hover:bg-red-100">Usun</button>
                         </div>
                       </td>
                     </tr>
@@ -1424,7 +1446,7 @@ function BudgetManager({ planning, onChange }: { planning: PlanningData; onChang
             </table>
           </div>
         )}
-      </CrudLayout>
+      </Panel>
     </div>
   );
 }
@@ -1888,6 +1910,16 @@ function FormActions({ editing, onCancel }: { editing: boolean; onCancel: () => 
 
 function Metric({ label, value }: { label: string; value: string }) {
   return <div className="rounded-2xl bg-white px-3 py-2 shadow-sm ring-1 ring-[#d8bd72]/25"><p className="text-xs text-zinc-500">{label}</p><p className="text-xl font-semibold">{value}</p></div>;
+}
+
+function BudgetMetric({ label, value, tone }: { label: string; value: number; tone: "neutral" | "paid" | "due" }) {
+  const toneClass = tone === "paid" ? "border-emerald-200 bg-emerald-50 text-emerald-900" : tone === "due" ? "border-amber-200 bg-amber-50 text-amber-900" : "border-[#d8bd72]/25 bg-white text-zinc-950";
+  return (
+    <div className={`rounded-2xl border px-4 py-4 shadow-sm ${toneClass}`}>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-65">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{formatMoney(value)}</p>
+    </div>
+  );
 }
 
 function Badge({ children, tone = "default" }: { children: React.ReactNode; tone?: "default" | "danger" }) {
