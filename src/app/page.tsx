@@ -26,7 +26,7 @@ export default function Home() {
       <section className="relative min-h-[92svh] overflow-hidden bg-[#f8f1e8]">
         <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(28,52,46,0.82),rgba(123,84,77,0.42)),url('/hero-wedding.svg')] bg-cover bg-center" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#fffaf4] to-transparent" />
-        <div className="absolute left-5 top-6 hidden rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur md:block">20 czerwca 2026</div>
+        <div className="absolute left-5 top-6 hidden rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur md:block">17 czerwca 2028</div>
         <div className="absolute right-8 top-10 hidden size-24 rounded-full border border-[#d8bd72]/45 md:block" />
         <div className="relative mx-auto flex min-h-[92svh] max-w-6xl flex-col justify-end px-5 pb-8 pt-16 sm:px-8 lg:px-12">
           <WeddingHero />

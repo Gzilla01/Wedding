@@ -10,7 +10,7 @@ const uploadSchema = z.object({
   caption: z.string().max(240).optional(),
 });
 
-export function UploadForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG || "nasze-wesele" }: { slug?: string }) {
+export function UploadForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG || "aleksandra-pawel-2028" }: { slug?: string }) {
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");

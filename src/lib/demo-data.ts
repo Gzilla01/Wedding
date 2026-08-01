@@ -1,13 +1,13 @@
 import { Cake, Car, Church, GlassWater, Music2, Sparkles, Utensils } from "lucide-react";
 
 export const wedding = {
-  bride: "Anna",
-  groom: "Michal",
-  date: "2026-06-20T14:00:00+02:00",
-  displayDate: "20 czerwca 2026",
+  bride: "Aleksandra",
+  groom: "Pawel",
+  date: "2028-06-17T14:00:00+02:00",
+  displayDate: "17 czerwca 2028",
   ceremonyTime: "14:00",
-  ceremonyAddress: "Kosciol sw. Anny, Krakow",
-  venueAddress: "Dworek Pod Lipami, ul. Lipowa 12, Krakow",
+  ceremonyAddress: "Miejsce ceremonii do uzupelnienia",
+  venueAddress: "Sala weselna do uzupelnienia",
 };
 
 export const themes = [

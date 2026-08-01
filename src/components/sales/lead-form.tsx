@@ -30,7 +30,7 @@ const initialState: LeadFormState = {
 export function LeadForm() {
   const [state, setState] = useState(initialState);
   const [submitted, setSubmitted] = useState(false);
-  const suggestedSlug = useMemo(() => normalizeWeddingSlug(state.slug || state.name || "nasze-wesele"), [state.name, state.slug]);
+  const suggestedSlug = useMemo(() => normalizeWeddingSlug(state.slug || state.name || "aleksandra-pawel-2028"), [state.name, state.slug]);
   const plan = commercialPlans.find((item) => item.id === state.planId) ?? commercialPlans[1];
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -75,7 +75,7 @@ export function LeadForm() {
       <h2 className="mt-2 text-2xl font-semibold">Opowiedz nam o weselu</h2>
       <div className="mt-5 grid gap-3">
         <Field label="Imiona / kontakt">
-          <input className={inputClass} value={state.name} onChange={(event) => setState({ ...state, name: event.target.value })} placeholder="Anna i Michal" />
+          <input className={inputClass} value={state.name} onChange={(event) => setState({ ...state, name: event.target.value })} placeholder="Aleksandra i Pawel" />
         </Field>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Email">

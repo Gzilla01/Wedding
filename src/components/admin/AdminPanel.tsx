@@ -327,7 +327,7 @@ function FaqManager({ items, onChange }: { items: FaqItem[]; onChange: (items: F
 
 function PublicationManager({ settings, wedding, onChange }: { settings: ThemeSettings; wedding: WeddingInfo; onChange: (settings: ThemeSettings) => void }) {
   const [draft, setDraft] = useState(settings);
-  const publicUrl = typeof window === "undefined" ? "/w/nasze-wesele" : `${window.location.origin}/w/${draft.coupleName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "nasze-wesele"}`;
+  const publicUrl = typeof window === "undefined" ? "/w/aleksandra-pawel-2028" : `${window.location.origin}/w/${draft.coupleName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "aleksandra-pawel-2028"}`;
   return (
     <Panel title="Publikacja i dostep" description="Ostatni krok przed wyslaniem linku gosciom i drukiem QR.">
       <form onSubmit={(event) => { event.preventDefault(); onChange(draft); }} className="grid gap-4">
@@ -339,7 +339,7 @@ function PublicationManager({ settings, wedding, onChange }: { settings: ThemeSe
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Nazwa strony"><input className={inputClass} value={draft.coupleName} onChange={(e) => setDraft({ ...draft, coupleName: e.target.value })} /></Field>
           <Field label="Tryb dostepu"><select className={inputClass} value={draft.accessMode} onChange={(e) => setDraft({ ...draft, accessMode: e.target.value as ThemeSettings["accessMode"] })}><option value="public">Publiczny link</option><option value="code">Kod z zaproszenia</option></select></Field>
-          <Field label="Kod wesela"><input className={inputClass} value={draft.weddingCode} onChange={(e) => setDraft({ ...draft, weddingCode: e.target.value.toUpperCase() })} placeholder="ANNA2026" /></Field>
+          <Field label="Kod wesela"><input className={inputClass} value={draft.weddingCode} onChange={(e) => setDraft({ ...draft, weddingCode: e.target.value.toUpperCase() })} placeholder="AP2028" /></Field>
           <Field label="Motyw"><select className={inputClass} value={draft.themeId} onChange={(e) => setDraft({ ...draft, themeId: e.target.value as ThemeSettings["themeId"] })}><option value="gold">Eleganckie zloto</option><option value="rustic">Rustykalne wesele</option><option value="white">Minimalistyczna biel</option><option value="boho">Boho</option><option value="green">Butelkowa zielen</option></select></Field>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
@@ -1575,9 +1575,9 @@ function ThemeManager({ settings, onChange, onReset }: { settings: ThemeSettings
           <p className="mt-1 text-sm leading-6 text-zinc-600">Kod mozesz wydrukowac w zaproszeniu. Osoby z samym linkiem nie zobacza strony bez kodu.</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <Field label="Tryb dostepu"><select className={inputClass} value={draft.accessMode} onChange={(e) => setDraft({ ...draft, accessMode: e.target.value as ThemeSettings["accessMode"] })}><option value="public">Publiczny link</option><option value="code">Kod z zaproszenia</option></select></Field>
-            <Field label="Kod wesela"><input className={inputClass} value={draft.weddingCode} onChange={(e) => setDraft({ ...draft, weddingCode: e.target.value.toUpperCase() })} placeholder="ANNA2026" /></Field>
+            <Field label="Kod wesela"><input className={inputClass} value={draft.weddingCode} onChange={(e) => setDraft({ ...draft, weddingCode: e.target.value.toUpperCase() })} placeholder="AP2028" /></Field>
           </div>
-          {draft.accessMode === "code" && <p className="mt-3 rounded-xl bg-white px-3 py-2 text-sm text-zinc-600">Tekst do zaproszenia: Kod do strony weselnej: <strong>{draft.weddingCode || "ANNA2026"}</strong></p>}
+          {draft.accessMode === "code" && <p className="mt-3 rounded-xl bg-white px-3 py-2 text-sm text-zinc-600">Tekst do zaproszenia: Kod do strony weselnej: <strong>{draft.weddingCode || "AP2028"}</strong></p>}
         </div>
         <div className="flex flex-wrap gap-2"><button type="submit" className={primaryButtonClass}>Zapisz ustawienia</button><SmallButton onClick={onReset}>Przywroc demo</SmallButton></div>
       </form>

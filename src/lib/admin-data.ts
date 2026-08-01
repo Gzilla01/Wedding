@@ -204,7 +204,7 @@ export type WeddingAdminData = {
   theme: ThemeSettings;
 };
 
-export const ADMIN_DATA_STORAGE_KEY = "nasze-wesele-admin-data";
+export const ADMIN_DATA_STORAGE_KEY = "aleksandra-pawel-2028-admin-data";
 
 export const emptyScheduleItem: Omit<ScheduleItem, "id"> = {
   time: "18:00",
@@ -398,15 +398,15 @@ export const demoGuests: Guest[] = Array.from({ length: 90 }, (_, index) => {
 
 export const demoWeddingAdminData: WeddingAdminData = {
   wedding: {
-    bride: "Anna",
-    groom: "Michal",
-    date: "2026-06-20",
+    bride: "Aleksandra",
+    groom: "Pawel",
+    date: "2028-06-17",
     ceremonyTime: "14:00",
-    ceremonyAddress: "Kosciol sw. Anny, Krakow",
-    venueAddress: "Dworek Pod Lipami, ul. Lipowa 12, Krakow",
+    ceremonyAddress: "Miejsce ceremonii do uzupelnienia",
+    venueAddress: "Sala weselna do uzupelnienia",
     welcomeText: "Cieszymy sie, ze bedziesz z nami. Tu znajdziesz plan dnia, swoje miejsce, lokalizacje i galerie.",
     contactPhone: "+48 500 100 200",
-    transportInfo: "Autobusy powrotne o 02:00 i 04:00 spod glownego wejscia.",
+    transportInfo: "Szczegoly transportu uzupelnimy blizej wesela.",
   },
   schedule: [
     { id: "schedule-ceremony", time: "14:00", title: "Ceremonia slubna", place: "Kosciol sw. Anny", owner: "Swiadkowa", status: "confirmed" },
@@ -477,12 +477,12 @@ export const demoWeddingAdminData: WeddingAdminData = {
     ],
   },
   theme: {
-    coupleName: "Anna i Michal",
+    coupleName: "Aleksandra i Pawel",
     themeId: "gold",
     accentColor: "#2f7d6d",
     coverStyle: "editorial",
     accessMode: "code",
-    weddingCode: "ANNA2026",
+    weddingCode: "AP2028",
     publicRsvp: true,
     galleryModeration: true,
     showWholeRoomToGuests: true,

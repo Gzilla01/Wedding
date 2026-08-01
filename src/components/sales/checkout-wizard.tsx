@@ -22,7 +22,7 @@ export function CheckoutWizard() {
   const [created, setCreated] = useState<WeddingInstance | null>(null);
   const [saveMode, setSaveMode] = useState<"api" | "local" | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const suggestedSlug = useMemo(() => normalizeWeddingSlug(draft.slug || draft.coupleNames || "nasze-wesele"), [draft.coupleNames, draft.slug]);
+  const suggestedSlug = useMemo(() => normalizeWeddingSlug(draft.slug || draft.coupleNames || "aleksandra-pawel-2028"), [draft.coupleNames, draft.slug]);
   const plan = commercialPlans.find((item) => item.id === draft.planId) ?? commercialPlans[1];
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -84,7 +84,7 @@ export function CheckoutWizard() {
         <p className="mt-3 text-sm leading-6 text-stone-600">Wprowadz dane pary. System wygeneruje adres publiczny, panel pary i limity pakietu.</p>
         <div className="mt-6 grid gap-4">
           <Field label="Imiona pary / nazwa wesela">
-            <input className={inputClass} value={draft.coupleNames} onChange={(event) => setDraft({ ...draft, coupleNames: event.target.value })} placeholder="Anna i Michal" />
+            <input className={inputClass} value={draft.coupleNames} onChange={(event) => setDraft({ ...draft, coupleNames: event.target.value })} placeholder="Aleksandra i Pawel" />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Email wlasciciela">

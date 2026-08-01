@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Heart, Video } from "lucide-react";
 
-export function GuestbookForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG || "nasze-wesele" }: { slug?: string }) {
+export function GuestbookForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG || "aleksandra-pawel-2028" }: { slug?: string }) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [videoName, setVideoName] = useState("");

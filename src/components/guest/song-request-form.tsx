@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Music2 } from "lucide-react";
 
-export function SongRequestForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG || "nasze-wesele" }: { slug?: string }) {
+export function SongRequestForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG || "aleksandra-pawel-2028" }: { slug?: string }) {
   const [songs, setSongs] = useState<Array<{ id: string; title: string; votes: number }>>([]);
   const [error, setError] = useState("");
 

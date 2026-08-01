@@ -18,7 +18,7 @@ const schema = z.object({
 
 type RsvpData = z.infer<typeof schema>;
 
-export function RsvpForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG || "nasze-wesele" }: { slug?: string }) {
+export function RsvpForm({ slug = process.env.NEXT_PUBLIC_WEDDING_SLUG || "aleksandra-pawel-2028" }: { slug?: string }) {
   const [done, setDone] = useState(false);
   const [serverError, setServerError] = useState("");
   const { register, handleSubmit, formState: { errors } } = useForm<RsvpData>({ resolver: zodResolver(schema), defaultValues: { attending: "yes" } });

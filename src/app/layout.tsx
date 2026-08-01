@@ -19,8 +19,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Nasze Wesele | Anna i Michal",
-  description: "Mobilne centrum informacji weselnej dla gosci.",
+  title: "Aleksandra i Pawel | Wesele 2028",
+  description: "Mobilne centrum informacji weselnej Aleksandry i Pawla.",
   manifest: "/manifest.webmanifest",
 };
 
