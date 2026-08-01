@@ -1,0 +1,16 @@
+{
+  "name": "Nasze Wesele",
+  "short_name": "Wesele",
+  "description": "Mobilne centrum informacji weselnej.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbfaf7",
+  "theme_color": "#2f5d50",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

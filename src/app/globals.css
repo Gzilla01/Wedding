@@ -1,0 +1,297 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fffaf4;
+  --foreground: #1c1917;
+  --wedding-green: #2f5d50;
+  --wedding-green-dark: #21453b;
+  --wedding-gold: #c2a45d;
+  --wedding-rose: #b77a82;
+  --wedding-blush: #fff1f0;
+  --wedding-cream: #fffaf4;
+  --wedding-paper: #f8efe3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+.font-display {
+  font-family: var(--font-display), var(--font-geist-sans), Georgia, serif;
+  font-weight: 650;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  content: "";
+  background:
+    radial-gradient(circle at 12% 8%, rgb(194 164 93 / 0.16), transparent 26rem),
+    radial-gradient(circle at 88% 18%, rgb(183 122 130 / 0.16), transparent 24rem),
+    linear-gradient(180deg, #fffaf4 0%, #fbf4ea 46%, #fffdf9 100%);
+}
+
+body::after {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  opacity: 0.55;
+  background-image:
+    linear-gradient(rgb(47 93 80 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(47 93 80 / 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, transparent, black 12%, black 78%, transparent);
+}
+
+html {
+  scroll-padding-top: 1.5rem;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--wedding-green), var(--wedding-green-dark));
+  padding: 0.85rem 1.15rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 18px 35px rgb(47 93 80 / 0.24);
+  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.btn-primary:hover {
+  background: #254b40;
+  transform: translateY(-1px);
+  box-shadow: 0 22px 44px rgb(47 93 80 / 0.30);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background: rgb(255 255 255 / 0.16);
+  padding: 0.85rem 1.15rem;
+  font-weight: 700;
+  color: white;
+  backdrop-filter: blur(12px);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.btn-secondary:hover {
+  background: rgb(255 255 255 / 0.23);
+  transform: translateY(-1px);
+}
+
+.btn-small,
+.btn-small-outline {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.btn-small {
+  background: var(--wedding-green);
+  color: white;
+}
+
+.btn-small-outline {
+  border: 1px solid #d6d3d1;
+  background: white;
+  color: #2f5d50;
+}
+
+.wedding-card {
+  border: 1px solid rgb(194 164 93 / 0.22);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(255 250 244 / 0.92)),
+    white;
+  box-shadow: 0 22px 55px rgb(80 50 28 / 0.08);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.wedding-card:hover {
+  border-color: rgb(194 164 93 / 0.38);
+  box-shadow: 0 28px 68px rgb(80 50 28 / 0.12);
+}
+
+.wedding-card-soft {
+  border: 1px solid rgb(194 164 93 / 0.18);
+  background: linear-gradient(180deg, #fffdfa, #fff6ee);
+  box-shadow: 0 16px 36px rgb(80 50 28 / 0.06);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.friendly-enter {
+  animation: friendly-rise 420ms ease both;
+}
+
+.reveal-section {
+  animation: friendly-rise 520ms ease both;
+  animation-timeline: view();
+  animation-range: entry 0% cover 28%;
+}
+
+.hero-glow-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-glow-line::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(110deg, transparent 0%, rgb(255 255 255 / 0.32) 48%, transparent 72%);
+  transform: translateX(-120%);
+  animation: hero-sheen 5.8s ease-in-out infinite;
+}
+
+.soft-pulse {
+  animation: soft-pulse 3.8s ease-in-out infinite;
+}
+
+@keyframes friendly-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-sheen {
+  0%,
+  58% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.wedding-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgb(194 164 93 / 0.28);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.7);
+  padding: 0.35rem 0.75rem;
+  color: #7b544d;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.wedding-eyebrow::before,
+.wedding-eyebrow::after {
+  content: "";
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: var(--wedding-gold);
+}
+
+.section-bloom {
+  position: relative;
+}
+
+.section-bloom::before {
+  position: absolute;
+  top: 1rem;
+  right: 6%;
+  width: 9rem;
+  height: 9rem;
+  border: 1px solid rgb(194 164 93 / 0.22);
+  border-radius: 999px;
+  content: "";
+  opacity: 0.75;
+}
+
+.section-bloom::after {
+  position: absolute;
+  top: 3rem;
+  right: calc(6% + 1.6rem);
+  width: 5.8rem;
+  height: 5.8rem;
+  border: 1px solid rgb(47 93 80 / 0.12);
+  border-radius: 999px;
+  content: "";
+  opacity: 0.62;
+}
+
+.field {
+  min-height: 3.25rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #d6d3d1;
+  background: white;
+  padding: 0.8rem 0.9rem;
+  outline: none;
+}
+
+.field:focus {
+  border-color: #2f5d50;
+  box-shadow: 0 0 0 3px rgb(47 93 80 / 0.12);
+}
