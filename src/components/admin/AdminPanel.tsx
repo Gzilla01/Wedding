@@ -1115,6 +1115,7 @@ function AccountsManager() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [sendingUserId, setSendingUserId] = useState<string | null>(null);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -1173,6 +1174,23 @@ function AccountsManager() {
     setUsers((current) => current.map((entry) => (entry.id === user.id ? payload.user : entry)));
   }
 
+  async function deleteUser(user: AdminUser) {
+    const confirmed = window.confirm(`Usunac konto ${user.email}? Tej operacji nie da sie cofnac.`);
+    if (!confirmed) return;
+    setMessage("");
+    setError("");
+    setDeletingUserId(user.id);
+    const response = await fetch(`/api/admin/users/${user.id}`, { method: "DELETE" });
+    setDeletingUserId(null);
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      setError(payload?.error ?? "Nie udalo sie usunac konta.");
+      return;
+    }
+    setMessage(`Usunieto konto ${user.email}.`);
+    setUsers((current) => current.filter((entry) => entry.id !== user.id));
+  }
+
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     window.location.href = "/login";
@@ -1198,14 +1216,12 @@ function AccountsManager() {
         </form>
       }>
         <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-          <table className="w-full min-w-[820px] border-collapse text-left text-sm">
+          <table className="w-full border-collapse text-left text-sm">
             <thead className="bg-[#fffaf4] text-xs uppercase tracking-[0.12em] text-zinc-500">
               <tr>
                 <th className="px-4 py-3">Nazwa</th>
                 <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Rola</th>
                 <th className="px-4 py-3">Status hasla</th>
-                <th className="px-4 py-3">Ostatnie logowanie</th>
                 <th className="px-4 py-3">Akcje</th>
               </tr>
             </thead>
@@ -1214,24 +1230,32 @@ function AccountsManager() {
                 <tr key={user.id} className="hover:bg-[#fffaf4]">
                   <td className="px-4 py-3 font-semibold text-zinc-900">{user.name}</td>
                   <td className="px-4 py-3 text-zinc-600">{user.email}</td>
-                  <td className="px-4 py-3"><Badge>Superadmin</Badge></td>
                   <td className="px-4 py-3">{user.mustChangePassword ? <Badge tone="warning">Do zmiany</Badge> : <Badge>Ustawione</Badge>}</td>
-                  <td className="px-4 py-3 text-zinc-600">{user.lastSignInAt ? formatDateTime(user.lastSignInAt) : "Jeszcze nie"}</td>
                   <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={() => resendInvite(user)}
-                      disabled={sendingUserId === user.id}
-                      className="h-8 rounded-md border border-zinc-300 bg-white px-3 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-wait disabled:opacity-60"
-                    >
-                      {sendingUserId === user.id ? "Wysylam..." : "Ponow zaproszenie"}
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => resendInvite(user)}
+                        disabled={sendingUserId === user.id || deletingUserId === user.id}
+                        className="h-8 rounded-md border border-zinc-300 bg-white px-3 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {sendingUserId === user.id ? "Wysylam..." : "Ponow"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteUser(user)}
+                        disabled={sendingUserId === user.id || deletingUserId === user.id}
+                        className="h-8 rounded-md border border-red-200 bg-red-50 px-3 text-xs font-semibold text-red-700 transition hover:bg-red-100 disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {deletingUserId === user.id ? "Usuwam..." : "Usun"}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
               {!users.length && (
                 <tr>
-                  <td className="px-4 py-6 text-center text-zinc-500" colSpan={6}>{loading ? "Laduje konta..." : "Brak kont w Supabase Auth. Awaryjnie nadal dziala login admin + haslo panelu."}</td>
+                  <td className="px-4 py-6 text-center text-zinc-500" colSpan={4}>{loading ? "Laduje konta..." : "Brak kont w Supabase Auth. Awaryjnie nadal dziala login admin + haslo panelu."}</td>
                 </tr>
               )}
             </tbody>
@@ -1980,12 +2004,6 @@ function snap(value: number) {
 
 function formatMoney(value: number) {
   return `${Math.round(value).toLocaleString("pl-PL")} zl`;
-}
-
-function formatDateTime(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString("pl-PL", { dateStyle: "short", timeStyle: "short" });
 }
 
 const inputClass = "min-h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-[#2f7d6d] focus:ring-2 focus:ring-[#2f7d6d]/20";
