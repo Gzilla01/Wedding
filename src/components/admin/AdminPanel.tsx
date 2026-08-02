@@ -1114,6 +1114,7 @@ function AccountsManager() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sendingUserId, setSendingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -1157,6 +1158,21 @@ function AccountsManager() {
     setUsers((current) => [payload.user, ...current.filter((user) => user.id !== payload.user.id)]);
   }
 
+  async function resendInvite(user: AdminUser) {
+    setMessage("");
+    setError("");
+    setSendingUserId(user.id);
+    const response = await fetch(`/api/admin/users/${user.id}/resend-invite`, { method: "POST" });
+    setSendingUserId(null);
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      setError(payload?.error ?? "Nie udalo sie ponowic wysylki.");
+      return;
+    }
+    setMessage(payload.email?.sent ? `Wyslano nowe haslo startowe do ${user.email}.` : "Haslo startowe zostalo zresetowane, ale e-mail nie zostal wyslany. Sprawdz Resend/Railway.");
+    setUsers((current) => current.map((entry) => (entry.id === user.id ? payload.user : entry)));
+  }
+
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     window.location.href = "/login";
@@ -1182,7 +1198,7 @@ function AccountsManager() {
         </form>
       }>
         <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-          <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[820px] border-collapse text-left text-sm">
             <thead className="bg-[#fffaf4] text-xs uppercase tracking-[0.12em] text-zinc-500">
               <tr>
                 <th className="px-4 py-3">Nazwa</th>
@@ -1190,6 +1206,7 @@ function AccountsManager() {
                 <th className="px-4 py-3">Rola</th>
                 <th className="px-4 py-3">Status hasla</th>
                 <th className="px-4 py-3">Ostatnie logowanie</th>
+                <th className="px-4 py-3">Akcje</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
@@ -1200,11 +1217,21 @@ function AccountsManager() {
                   <td className="px-4 py-3"><Badge>Superadmin</Badge></td>
                   <td className="px-4 py-3">{user.mustChangePassword ? <Badge tone="warning">Do zmiany</Badge> : <Badge>Ustawione</Badge>}</td>
                   <td className="px-4 py-3 text-zinc-600">{user.lastSignInAt ? formatDateTime(user.lastSignInAt) : "Jeszcze nie"}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => resendInvite(user)}
+                      disabled={sendingUserId === user.id}
+                      className="h-8 rounded-md border border-zinc-300 bg-white px-3 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-wait disabled:opacity-60"
+                    >
+                      {sendingUserId === user.id ? "Wysylam..." : "Ponow zaproszenie"}
+                    </button>
+                  </td>
                 </tr>
               ))}
               {!users.length && (
                 <tr>
-                  <td className="px-4 py-6 text-center text-zinc-500" colSpan={5}>{loading ? "Laduje konta..." : "Brak kont w Supabase Auth. Awaryjnie nadal dziala login admin + haslo panelu."}</td>
+                  <td className="px-4 py-6 text-center text-zinc-500" colSpan={6}>{loading ? "Laduje konta..." : "Brak kont w Supabase Auth. Awaryjnie nadal dziala login admin + haslo panelu."}</td>
                 </tr>
               )}
             </tbody>
